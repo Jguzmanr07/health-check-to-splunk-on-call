@@ -50,13 +50,15 @@ jobs:
         run: |
           echo "export CLOUDFLARE_ACCOUNT_ID=${{ env.CLOUDFLARE_ACCOUNT_ID }}" >> $GITHUB_ENV
           echo "export CLOUDFLARE_API_TOKEN=${{ env.CLOUDFLARE_API_TOKEN }}" >> $GITHUB_ENV
-      - uses: cloudflare/wrangler-action@2.0
-      - name: Publish worker code
-        run: wrangler  publish
+      - uses: actions/checkout@v3
       - name: Publish
-        uses: cloudflare/wrangler-action@2.0
+        uses: cloudflare/wrangler-action@2.0.0
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Publish
+        uses: cloudflare/wrangler-action@2.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           preCommands: |
             wrangler kv:namespace create KV_STATUS_PAGE
             apt-get update && apt-get install -y jq
