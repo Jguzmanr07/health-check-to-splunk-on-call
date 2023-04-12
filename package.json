@@ -1,17 +1,17 @@
 {
-  "name": "health-check-to-splunk-on-call",
+  "name": "health-check-to-googlechat",
   "private": true,
   "version": "0.0.0",
-  "description": "Relay Cloudflare health check payload to Splunk On-Call (FKA Victorops)",
+  "description": "Relay Cloudflare health check payload to googlechat (Jesús Guzmán)",
   "keywords": [
     "Cloudflare",
     "Health-Check",
-    "Splunk-On-Call",
-    "Victorops",
+    "googlechat",
+    "Jguzman",
     "Notification",
     "Incident"
   ],
-  "author": "Fiverr",
+  "author": "Jguzman",
   "license": "Unlicense",
   "main": "index.js",
   "type": "module",
