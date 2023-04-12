@@ -46,8 +46,6 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
-      - name: Attach workspace
-        uses: actions/workspace@v2
       - name: Setup Environment Variables
         run: |
           echo "export CLOUDFLARE_ACCOUNT_ID=${{ env.CLOUDFLARE_ACCOUNT_ID }}" >> $GITHUB_ENV
