@@ -38,9 +38,7 @@ jobs:
     container:
       image: cimg/node:current
       env:
-        DOCKER_USER: ${{ env.DOCKER_USER }}
-        DOCKER_PASS: ${{ env.DOCKER_PASS }}
-        CLOUDFLARE_ACCOUNT_ID: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+        account_id: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
         CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}
     needs: test
     if: github.ref == 'refs/heads/master'
