@@ -1,47 +1,56 @@
-defaults: &defaults
-  working_directory: ~/app
-  docker:
-    - image: cimg/node:current
-      auth:
-        username: $DOCKER_USER
-        password: $DOCKER_PASS
-version: 2.1
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  DOCKER_USER: ${{ secrets.DOCKER_USER }}
+  DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUT_ID }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CF_WORKERS_API_TOKEN }}
+
 jobs:
   test:
-    <<: *defaults
+    runs-on: ubuntu-latest
+    container:
+      image: cimg/node:current
+      env:
+        DOCKER_USER: ${{ env.DOCKER_USER }}
+        DOCKER_PASS: ${{ env.DOCKER_PASS }}
     steps:
-      - checkout
-      - run: npm i
-      - persist_to_workspace:
-          root: .
-          paths:
-            - node_modules
-      - run: npm t
-      - run: npm run lint
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: npm i
+      - name: Persist node_modules cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - name: Run tests
+        run: npm t
+      - name: Run linter
+        run: npm run lint
+
   publish:
-    <<: *defaults
+    runs-on: ubuntu-latest
+    container:
+      image: cimg/node:current
+      env:
+        DOCKER_USER: ${{ env.DOCKER_USER }}
+        DOCKER_PASS: ${{ env.DOCKER_PASS }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
+        CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}
+    needs: test
+    if: github.ref == 'refs/heads/master'
     steps:
-      - checkout
-      - attach_workspace:
-          at: .
-      - run:
-          name: Setup Environment Variables
-          command: |
-            echo 'export CLOUDFLARE_ACCOUNT_ID=$CF_ACCOUT_ID' >> $BASH_ENV
-            echo 'export CLOUDFLARE_API_TOKEN=$CF_WORKERS_API_TOKEN' >> $BASH_ENV
-      - run:
-          name: Publish the worker code
-          command: npm run publish
-workflows:
-  publish:
-    jobs:
-      - test:
-          context: org-global
-      - publish:
-          context: org-global
-          requires:
-            - test
-          filters:
-            branches:
-              only:
-                - master
+      - uses: actions/checkout@v2
+      - name: Attach workspace
+        uses: actions/workspace@v2
+      - name: Setup Environment Variables
+        run: |
+          echo "export CLOUDFLARE_ACCOUNT_ID=${{ env.CLOUDFLARE_ACCOUNT_ID }}" >> $GITHUB_ENV
+          echo "export CLOUDFLARE_API_TOKEN=${{ env.CLOUDFLARE_API_TOKEN }}" >> $GITHUB_ENV
+      - name: Publish worker code
+        run: npm run publish
