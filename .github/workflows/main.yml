@@ -50,7 +50,6 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          wranglerVersion: '2.14.0'
         env:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       # - name: Publish
